@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin_bottom"
+    tools:context=".TimetableActivity"
+    android:orientation="vertical">
+
+
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:id="@+id/titleRowLinearLayout"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:id="@+id/blank_grid"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/Monday_str"
+            style="timetable_titlerow_grid"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/Tuesday_str"
+            style="timetable_titlerow_grid"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/Wednesday_str"
+            style="timetable_titlerow_grid"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/Thursday_str"
+            style="timetable_titlerow_grid"
+            android:layout_weight="1"/>
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:text="@string/Friday_str"
+            style="timetable_dayRow_grid"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/timetableHolderScrollView"
+        android:layout_below="@id/titleRowLinearLayout">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <me.ziningzhu.uttimetable.TimeTable
+                android:id="@+id/timeTable"
+                android:layout_height="300dp"
+                android:layout_width="match_parent"
+
+                />
+        </LinearLayout>
+
+
+
+    </ScrollView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/navbar">
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/timetable_tab_button"
+            android:text="@string/button_timetable_tab_string"/>
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:id="@+id/browser_tab_button"
+            android:text="@string/button_browser_tab_string"/>
+    </LinearLayout>
+</RelativeLayout>
