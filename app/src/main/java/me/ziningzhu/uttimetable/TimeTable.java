@@ -49,6 +49,7 @@ public class TimeTable extends ViewGroup {
         }
 
         setWillNotDraw(false);
+
         init();
     }
 
@@ -79,7 +80,7 @@ public class TimeTable extends ViewGroup {
 
         // Draws background
         canvas.drawRect(mTableBounds, mBackgroundPaint);
-        Log.d(TAG, "mTableBounds are " + mTableBounds.toString());
+        //Log.d(TAG, "background drawing; mTableBounds are " + mTableBounds.toString());
         canvas.drawRect(mShadowBounds, mShadowPaint);
 
         for (int i = 0; i < mCellViews.size(); i++) {
@@ -110,7 +111,7 @@ public class TimeTable extends ViewGroup {
         mTableBounds = new RectF(0.0f, 0.0f, ww, hh);
         mTableBounds.offsetTo(getPaddingLeft(), getPaddingTop());
 
-        Log.d(TAG, "onSizeChanged: mTableBounds" + mTableBounds.toString());
+        //Log.d(TAG, "onSizeChanged: mTableBounds" + mTableBounds.toString());
 
         // Lay out the child view that actually draws the pie.
         for (int i=0; i < mCellViews.size(); i++) {
@@ -169,8 +170,8 @@ public class TimeTable extends ViewGroup {
         float top = mTableBounds.top + (start_time - 9) * CELL_HEIGHT;
         float bottom = mTableBounds.top + (end_time - 9) * CELL_HEIGHT;
         RectF rectf = new RectF(left, top, right, bottom);
-        Log.d(TAG, "Session " + cv.getSession().toString() + "; day " + String.format("%d", cv.getDay())
-                + ", rectf " + rectf.toString());
+        //Log.d(TAG, "Session " + cv.getSession().toString() + "; day " + String.format("%d", cv.getDay())
+        //        + ", rectf " + rectf.toString());
         return rectf;
     }
     private void setLayerToSW(View v) {
@@ -228,7 +229,7 @@ public class TimeTable extends ViewGroup {
             float startx = mBounds.left + mTextPaddingLeft;
             float starty = mBounds.bottom - mTextPaddingBottom;
             canvas.drawText(mText, startx, starty, mTextPaint);
-            Log.d(TAG, "session " + mSession.toString() +", mBounds are " + mBounds.toString());
+            //Log.d(TAG, "session " + mSession.toString() +", mBounds are " + mBounds.toString());
         }
 
         @Override
@@ -258,7 +259,7 @@ public class TimeTable extends ViewGroup {
                 mTextPaddingLeft = (mBounds.width() - mTextWidth) / 2;
             }
 
-            Log.d(TAG, "setBounds(). suitableTextHeight = " + String.format("%2f", suitableTextHeight));
+            //Log.d(TAG, "setBounds(). suitableTextHeight = " + String.format("%2f", suitableTextHeight));
             mTextPaint.setTextSize(suitableTextHeight);
         }
 
@@ -288,8 +289,5 @@ public class TimeTable extends ViewGroup {
 
     }
 
-    /* fixme - Not sure if I need a separate class to store info state though */
-    private class SessionItem {
-        public Session mSession;
-    }
+
 }

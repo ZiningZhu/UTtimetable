@@ -3,6 +3,8 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="clear_selections">Clear Selections</string>
+
 
     <string name="title_activity_browser">BrowserActivity</string>
     <string name="search_bar_hint"> Input course. Eg: CSC180H1F</string>

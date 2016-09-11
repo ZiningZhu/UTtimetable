@@ -23,10 +23,16 @@ import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Evaluator;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -41,6 +47,7 @@ public class BrowserActivity extends AppCompatActivity {
     private ListView mCandidateCoursesListView;
     private String mCourseString;
     private final String TAG = "HandyCourse_Browser";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,19 +71,7 @@ public class BrowserActivity extends AppCompatActivity {
         mSearchCourseButton.setBackgroundColor(getResources().getColor(R.color.button_material_light));
         mSearchCourseButton.setTextColor(getResources().getColor(R.color.black));
 
-        // Recover the EditText and TextView contents
-        SharedPreferences settings = getSharedPreferences("BrowserSharedPreference", 0);
-        if(settings.contains("SearchBarEditText")) {
-            mCourseString = settings.getString("SearchBarEditText", "");
-            mInputCourseEditText.setText(mCourseString);
 
-            if(checkCourseCodeCorrectness(mCourseString)) {
-                setSearchCourseButtonClickable(true);
-            }
-        } else {;}
-        if(settings.contains("IntroductionTextView")) {
-            mIntroductionTextView.setText(settings.getString("IntroductionTextView", ""));
-        } else {mIntroductionTextView.setText(R.string.incomplete_search_area_introduction);}
 
         // Wire up the widgets
         mTimetableTabButton.setOnClickListener(new View.OnClickListener() {
@@ -108,11 +103,10 @@ public class BrowserActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                SharedPreferences settings = getSharedPreferences("BrowserSharedPreference", 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("SearchBarEditText", mCourseString);
-                editor.apply();
+                ;
             }
+
+
         });
         mSearchCourseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -132,9 +126,67 @@ public class BrowserActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        final String TAG = "BrowserActivity onResume()";
+        super.onResume();
+
+        // Recover the EditText and TextView contents
+        SharedPreferences settings = getSharedPreferences("BrowserSharedPreference", 0);
+        if(settings.contains("SearchBarEditText")) {
+            mCourseString = settings.getString("SearchBarEditText", "");
+            mInputCourseEditText.setText(mCourseString);
+
+
+            if(checkCourseCodeCorrectness(mCourseString)) {
+                setSearchCourseButtonClickable(true);
+            }
+        }
+        if(mIntroductionTextView.getText().equals("")) {
+            mIntroductionTextView.setText(R.string.incomplete_search_area_introduction);
+        }
+
+        // Recovering: render the candidate sessions and selection results without making Internet request
+        try {
+            File file = new File(getApplicationContext().getFilesDir(), "browser_info.tmp");
+            FileInputStream fin = new FileInputStream(file);
+            ObjectInputStream oin = new ObjectInputStream(fin);
+            ArrayList<Session> arraySessions;
+            String desc = (String) oin.readObject();
+            arraySessions = (ArrayList<Session>) oin.readObject();
+            oin.close();
+            fin.close();
+
+            mIntroductionTextView.setText(desc);
+
+            mCourseListAdapter = new CourseListAdapter(getApplicationContext(), arraySessions);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch(ClassNotFoundException c) {
+            Log.e(TAG, "Class not found when rendering adapter.");
+        }
+
+        mCandidateCoursesListView.setAdapter(mCourseListAdapter);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Store the text string in sharedPreference
+        SharedPreferences settings = getSharedPreferences("BrowserSharedPreference", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("SearchBarEditText", mCourseString);
+        editor.apply();
+
+
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_browser, menu);
+        getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
@@ -149,7 +201,19 @@ public class BrowserActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
+        if (id == R.id.clear_selections) {
+            File file = new File(getApplicationContext().getFilesDir(), "selected_sessions.ser");
+            try {
+                FileOutputStream fos = new FileOutputStream(file);
+                ObjectOutputStream out = new ObjectOutputStream(fos);
+                ArrayList<Session> none = new ArrayList<Session>();
+                out.writeObject(none);
+                out.close();
+                fos.close();
+            } catch(IOException e){
+                e.printStackTrace();
+            }
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -256,8 +320,7 @@ public class BrowserActivity extends AppCompatActivity {
             Elements sessions = course.getElementsByTag("session");
 
             ArrayList<Session> arraySessions = new ArrayList<Session>();
-            // todo - store all the information needed to display onto the calendar. Gonna be done in adapter.
-            // grab the course time stuffs into an ArrayList.
+
 
 
             for(int i = 0; i < sessions.size(); i++) {
@@ -266,10 +329,25 @@ public class BrowserActivity extends AppCompatActivity {
                 String location = session.select("location").first().text();
                 String time = session.select("time").first().text();
                 String prof = session.select("prof").first().text();
-                Log.d(TAG, "Grabbing info from a session");
+
                 Session c = new Session(courseCode, sessionName, location, time, prof);
                 arraySessions.add(c);
             }
+
+
+            // Stores search result into file
+            File file = new File(getApplicationContext().getFilesDir(), "browser_info.tmp");
+            try {
+                FileOutputStream fout = new FileOutputStream(file);
+                ObjectOutputStream out = new ObjectOutputStream(fout);
+                out.writeObject(intro);
+                out.writeObject(arraySessions);
+                out.close();
+                fout.close();
+            } catch(IOException e) {
+                e.printStackTrace();
+            }
+
 
             // Inflate the ListView
             mCourseListAdapter = new CourseListAdapter(getApplicationContext(), arraySessions);

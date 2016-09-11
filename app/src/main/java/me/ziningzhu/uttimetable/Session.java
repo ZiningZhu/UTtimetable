@@ -21,7 +21,7 @@ public class Session implements java.io.Serializable{
     private String mSession_name; // "LEC0101"
 
     private String mCourse_time;
-    /* "M3-5" or "MWF3-5". Note there may be different sessions having the same session name.
+    /* "ONLINE" or "M3-5" or "MWF3-5". Note there may be different sessions having the same session name.
      * These are going to be handled separately (aka. drawn into different cells)
      * For each session, the String mCourse_time has two components.
      * String component indicates the day(s) in the week;
@@ -50,9 +50,9 @@ public class Session implements java.io.Serializable{
 
 
         int i;
-        Log.d(TAG, "mCourse_time is" + mCourse_time);
+
         if (mCourse_time.equals("ONLINE")) {
-            mCourse_time = "";
+
             mStartTime = 0;
             mEndTime = 0;
             return;
@@ -79,6 +79,10 @@ public class Session implements java.io.Serializable{
 
     public ArrayList<Integer> getDays() {
         ArrayList<Integer> days = new ArrayList<>();
+        if(mCourse_time.equals("ONLINE")) {
+            days.add(Integer.valueOf(0));
+            return days;
+        }
         int i;
         for(i = 0; Character.isLetter(mCourse_time.charAt(i)); i++) {;}
         String day_str = mCourse_time.substring(0, i);
@@ -92,6 +96,7 @@ public class Session implements java.io.Serializable{
 
     public String toString() {
         String s = mCourse_name + ", ";
+        s += mSession_name + ", ";
         s += mLocation + ", ";
         s += mCourse_time + ", ";
         s += mProf_name + ";";
@@ -138,7 +143,7 @@ public class Session implements java.io.Serializable{
     }
 
     public String getSection_code() {
-        return mSection_code;
+        return mCourse_name.substring(mCourse_name.length()-1);
     }
 
     public void setSection_code(String section_code) {
